@@ -11,18 +11,28 @@ card_to_playlist = {
 }
 
 chromecasts = pychromecast.get_chromecasts()
-cast = next(cc for cc in chromecasts if cc.device.friendly_name == 'MIBOX3')
 
-# Wait for the cast to connect
-cast.wait()
+# Corrected line to find the Chromecast device
+cast = next((cc for cc in chromecasts if cc.device.friendly_name == 'MIBOX3'), None)
+
+if cast:
+    # Wait for the cast to connect
+    cast.wait()
+else:
+    print("MIBOX3 not found. Make sure it's on and connected to the same network.")
+    exit()
 
 def play_music(card_id):
     if card_id in card_to_playlist:
         playlist_url = card_to_playlist[card_id]
-
-        mc = cast.media_controller
-        mc.play_media(playlist_url, "video/mp4")
-        mc.block_until_active()
+        
+        # Check if the media controller is available
+        if cast.media_controller:
+            mc = cast.media_controller
+            mc.play_media(playlist_url, "video/mp4")
+            mc.block_until_active()
+        else:
+            print("Media controller is not available on this device.")
 
 while True:
     try:
@@ -30,7 +40,7 @@ while True:
         id, text = reader.read()
         print(f"Tag ID: {id}")
         print(f"Text: {text}")
-        play_music(id)
+        play_music(str(id))  # Convert id to a string for dictionary lookup
     except Exception as e:
         print(f"An error occurred: {e}")
 
