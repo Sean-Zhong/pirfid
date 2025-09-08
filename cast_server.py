@@ -11,19 +11,30 @@ card_to_playlist = {
     "769481040605": "https://music.youtube.com/playlist?list=OLAK5uy_lh8IDILeWhuRYlJsOS7DndJkBr94VnKcY&si=c4ANd_WLzYWERxXZ"
 }
 
-cast_ip = "192.168.111.148"
 cast = None
+browser = None
 
 try:
-    print(f"Connecting directly to MIBOX3 at {cast_ip}...")
-    # Direct connection with IP is supported by this version
-    cast = pychromecast.Chromecast(cast_ip)
-    cast.wait()
-    print(f"Successfully connected to: {cast.device.friendly_name}")
+    print("Scanning for Chromecast devices...")
+    chromecasts, browser = pychromecast.get_chromecasts()
+
+    # This code is now correct for your modern pychromecast version
+    cast = next((cc for cc in chromecasts if cc.device.friendly_name == 'MIBOX3'), None)
+
+    if cast:
+        cast.wait()
+        logging.info(f"Successfully connected to Chromecast: {cast.device.friendly_name}")
+    else:
+        logging.error("MIBOX3 not found on the network. Make sure it's on and connected to the same network.")
+        exit()
 
 except Exception as e:
-    logging.error(f"An error occurred during direct connection: {e}")
+    logging.error(f"An error occurred during Chromecast discovery: {e}")
     exit()
+
+finally:
+    if browser:
+        pychromecast.discovery.stop_discovery(browser)
 
 @app.route("/cast", methods=["POST"])
 def cast_music():
