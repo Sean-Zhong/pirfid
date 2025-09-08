@@ -1,2 +1,2 @@
 Flask
-PyChromecast
+pychromecast==12.1.4
