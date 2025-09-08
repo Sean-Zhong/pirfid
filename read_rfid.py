@@ -8,7 +8,7 @@ GPIO.setwarnings(False)
 
 reader = SimpleMFRC522()
 
-server_url = "192.168.111.98:5000/cast"
+server_url = "http://192.168.111.98:5000/cast"
 
 while True:
     try:
