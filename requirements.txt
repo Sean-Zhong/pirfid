@@ -1,2 +1,2 @@
 Flask
-androidtv
+androidtv==0.0.18
