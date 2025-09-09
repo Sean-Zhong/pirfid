@@ -3,5 +3,5 @@ services:
     image: szh11/pirfid:latest
     network_mode: "host"
     restart: always
-    ports:
-      - "5000:5000"
+    volumes:
+      - /root/.android:/root/.android
