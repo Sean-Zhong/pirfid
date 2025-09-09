@@ -1,2 +1,2 @@
 Flask
-pychromecast==12.1.4
+androidtv
