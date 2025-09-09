@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from androidtv.androidtv import AndroidTV
+from androidtv import AndroidTV
 import logging
 
 # Set up logging to show information level messages
