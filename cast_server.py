@@ -11,9 +11,10 @@ HA_URL = os.getenv("HA_URL")
 HA_TOKEN = os.getenv("HA_TOKEN")
 MEDIA_PLAYER_ENTITY_ID = os.getenv("MEDIA_PLAYER_ENTITY_ID")
 
+# --- Use the VALID URIs you found in the Music Assistant UI ---
 card_to_playlist = {
-    "908452881079": "ytmusic://playlist/OLAK5uy_nMi553Un-V3VCacIvHuLPUgXfEdPmHaP8",
-    "769452881079": "ytmusic://playlist/OLAK5uy_lh8IDILeWhuRYlJsOS7DndJkBr94VnKcY"
+    "908452881079": "ytmusic://album/MPREb_NA9bTHvhFmF", #Illmatic
+    "769481040605": "ytmusic://album/MPREb_vbNohrhu6ae"  #Ride the lightning
 }
 
 if not all([HA_URL, HA_TOKEN, MEDIA_PLAYER_ENTITY_ID]):
@@ -22,9 +23,6 @@ if not all([HA_URL, HA_TOKEN, MEDIA_PLAYER_ENTITY_ID]):
 
 @app.route("/cast", methods=["POST"])
 def cast_music():
-    """
-    API endpoint to trigger the Music Assistant (mass.play_media) service.
-    """
     try:
         data = request.json
         card_id = data.get("card_id")
@@ -32,11 +30,12 @@ def cast_music():
         if card_id not in card_to_playlist:
             return jsonify({"status": "error", "message": "Card ID not found"}), 404
 
-        playlist_uri = card_to_playlist[card_id]
-        logging.info(f"Received card ID {card_id}. Telling Music Assistant to play URI: {playlist_uri}")
+        uri = card_to_playlist[card_id]
+        media_type = uri.split("://")[1].split("/")[0]
+        
+        logging.info(f"Calling music_assistant.play_media with URI: {uri} on player {MEDIA_PLAYER_ENTITY_ID}")
 
-        # --- Music Assistant API Call ---
-        service_url = f"{HA_URL}/api/services/mass/play_media"
+        service_url = f"{HA_URL}/api/services/music_assistant/play_media"
         
         headers = {
             "Authorization": f"Bearer {HA_TOKEN}",
@@ -44,9 +43,9 @@ def cast_music():
         }
 
         payload = {
-            "player_id": MEDIA_PLAYER_ENTITY_ID,
-            "media_id": playlist_uri,
-            "media_type": "playlist" # <-- The required fix
+            "entity_id": MEDIA_PLAYER_ENTITY_ID,
+            "media_id": uri,
+            "media_type": media_type 
         }
 
         response = requests.post(service_url, headers=headers, json=payload)
