@@ -11,10 +11,9 @@ HA_URL = os.getenv("HA_URL")
 HA_TOKEN = os.getenv("HA_TOKEN")
 MEDIA_PLAYER_ENTITY_ID = os.getenv("MEDIA_PLAYER_ENTITY_ID")
 
-# --- Manually constructed Music Assistant URIs ---
 card_to_playlist = {
     "908452881079": "ytmusic://playlist/OLAK5uy_nMi553Un-V3VCacIvHuLPUgXfEdPmHaP8",
-    "769481040605": "ytmusic://playlist/OLAK5uy_lh8IDILeWhuRYlJsOS7DndJkBr94VnKcY"
+    "769452881079": "ytmusic://playlist/OLAK5uy_lh8IDILeWhuRYlJsOS7DndJkBr94VnKcY"
 }
 
 if not all([HA_URL, HA_TOKEN, MEDIA_PLAYER_ENTITY_ID]):
@@ -47,6 +46,7 @@ def cast_music():
         payload = {
             "player_id": MEDIA_PLAYER_ENTITY_ID,
             "media_id": playlist_uri,
+            "media_type": "playlist" # <-- The required fix
         }
 
         response = requests.post(service_url, headers=headers, json=payload)
