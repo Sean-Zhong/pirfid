@@ -1,37 +1,34 @@
 from flask import Flask, request, jsonify
-from androidtv import AndroidTV
 import logging
-import time
+import os
+import requests
 
 # Set up logging to show information level messages
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
+# --- Home Assistant Configuration ---
+# These are loaded from the environment variables in your docker-compose.yml
+HA_URL = os.getenv("HA_URL")
+HA_TOKEN = os.getenv("HA_TOKEN")
+MEDIA_PLAYER_ENTITY_ID = os.getenv("MEDIA_PLAYER_ENTITY_ID")
+
 # A dictionary mapping a card ID to a YouTube Music playlist URL.
 card_to_playlist = {
     "908452881079": "https://music.youtube.com/playlist?list=OLAK5uy_nMi553Un-V3VCacIvHuLPUgXfEdPmHaP8&si=zvXkdmnNiDZy4cE1",
-    "769481040605": "https://music.youtube.com/playlist?list=OLAK5uy_lh8IDILeWhuRYlJsOS7DndJkBr94VnKcY&si=c4ANd_WLxYWERxXZ"
+    "769481040605": "https://music.youtube.com/playlist?list=OLAK5uy_lh8IDILeWhuRYlJsOS7DndJkBr94VnKcY&si=c4ANd_WLzYWERxXZ"
 }
 
-# --- Android TV Setup ---
-ANDROID_TV_IP = "192.168.111.148"
-atv = None
-
-try:
-    logging.info(f"Attempting to connect to Android TV at {ANDROID_TV_IP}...")
-    atv = AndroidTV(host=ANDROID_TV_IP, adbkey='/root/.android/adbkey')
-    logging.info(f"Successfully connected to Android TV at {ANDROID_TV_IP}")
-
-except Exception as e:
-    logging.error(f"Failed to connect to Android TV at {ANDROID_TV_IP}. Error: {e}")
-    logging.error("Please ensure ADB Debugging is enabled on the TV and you have accepted the connection prompt from this server.")
+# Validate that environment variables are set
+if not all([HA_URL, HA_TOKEN, MEDIA_PLAYER_ENTITY_ID]):
+    logging.error("Missing required environment variables (HA_URL, HA_TOKEN, MEDIA_PLAYER_ENTITY_ID)")
     exit()
 
 @app.route("/cast", methods=["POST"])
 def cast_music():
     """
-    API endpoint to play a YouTube Music playlist on an Android TV based on a card ID.
+    API endpoint to trigger a Home Assistant service call to play media.
     """
     try:
         data = request.json
@@ -41,22 +38,31 @@ def cast_music():
             return jsonify({"status": "error", "message": "Card ID not found"}), 404
 
         playlist_url = card_to_playlist[card_id]
-        logging.info(f"Received card ID {card_id}. Playing playlist: {playlist_url}")
+        logging.info(f"Received card ID {card_id}. Triggering HA for playlist: {playlist_url}")
 
-        # Step 1: Force stop the YouTube Music app to ensure a clean state
-        atv.adb_shell('am force-stop com.google.android.apps.youtube.music')
-        time.sleep(2) # Give it a moment to stop
+        # --- Home Assistant API Call ---
+        service_url = f"{HA_URL}/api/services/media_player/play_media"
+        
+        headers = {
+            "Authorization": f"Bearer {HA_TOKEN}",
+            "Content-Type": "application/json",
+        }
 
-        # Step 2: Send the deep link command to open the playlist view.
-        atv.adb_shell(f"am start -a android.intent.action.VIEW -d '{playlist_url}'")
+        payload = {
+            "entity_id": MEDIA_PLAYER_ENTITY_ID,
+            "media_content_id": playlist_url,
+            "media_content_type": "playlist", # This is important for YouTube Music playlists
+        }
 
-        # Step 3: Add a short delay to allow the app to load.
-        time.sleep(5)
+        response = requests.post(service_url, headers=headers, json=payload)
 
-        # Step 4: Send a key event to start playback.
-        atv.adb_shell("input keyevent KEYCODE_MEDIA_PLAY_PAUSE")
-
-        return jsonify({"status": "success", "message": f"Playing playlist for card ID: {card_id}"}), 200
+        # Check if the API call was successful
+        if response.status_code == 200:
+            logging.info(f"Successfully sent command to Home Assistant. Status: {response.status_code}")
+            return jsonify({"status": "success", "message": "Command sent to Home Assistant."}), 200
+        else:
+            logging.error(f"Failed to send command to Home Assistant. Status: {response.status_code}, Response: {response.text}")
+            return jsonify({"status": "error", "message": "Failed to call Home Assistant service."}), 500
 
     except Exception as e:
         logging.error(f"An error occurred: {e}")

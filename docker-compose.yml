@@ -1,7 +1,12 @@
 services:
   pirfid:
+    build: .
     image: szh11/pirfid:latest
     network_mode: "host"
     restart: always
-    volumes:
-      - /root/.android:/root/.android
+    environment:
+      - HA_URL=${HA_URL}
+      - HA_TOKEN=${HA_TOKEN}
+      - MEDIA_PLAYER_ENTITY_ID=${MEDIA_PLAYER_ENTITY_ID}
+    ports:
+      - "5000:5000"
