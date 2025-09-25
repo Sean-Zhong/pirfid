@@ -1,0 +1,12 @@
+[Unit]
+Description=RFID Reader Service
+After=network.target
+
+[Service]
+User=sean
+WorkingDirectory=/home/sean/pirfid
+ExecStart=/home/sean/pirfid/env/bin/python /home/sean/pirfid/read_rfid.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
