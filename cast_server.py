@@ -13,8 +13,8 @@ MEDIA_PLAYER_ENTITY_ID = os.getenv("MEDIA_PLAYER_ENTITY_ID")
 
 # --- Use the VALID URIs you found in the Music Assistant UI ---
 card_to_playlist = {
-    "908452881079": "ytmusic://album/MPREb_NA9bTHvhFmF", #Illmatic
-    "769481040605": "ytmusic://album/MPREb_vbNohrhu6ae"  #Ride the lightning
+    "a14759bc": "ytmusic://album/MPREb_NA9bTHvhFmF", #Illmatic
+    "713459bc": "ytmusic://album/MPREb_vbNohrhu6ae"  #Ride the lightning
 }
 
 if not all([HA_URL, HA_TOKEN, MEDIA_PLAYER_ENTITY_ID]):
