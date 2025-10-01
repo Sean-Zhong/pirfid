@@ -16,6 +16,7 @@ while True:
         full_id_decimal, text = reader.read()
         full_id_hex = hex(full_id_decimal)[2:]
         first_4_bytes_hex = full_id_hex[:8]
+        print("Sending id: " + first_4_bytes_hex)
         response = requests.post(server_url, json={"card_id": first_4_bytes_hex})
 
         if response.status_code == 200:
