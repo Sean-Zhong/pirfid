@@ -13,7 +13,7 @@ MEDIA_PLAYER_ENTITY_ID = os.getenv("MEDIA_PLAYER_ENTITY_ID")
 
 # --- Use the VALID URIs you found in the Music Assistant UI ---
 card_to_playlist = {
-    "a14759bc": "library://album/70", #Illmatic
+    "a14759bc": "library://album/1", #Illmatic
     "713459bc": "library://album/2"  #Ride the lightning
 }
 
