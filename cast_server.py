@@ -13,10 +13,10 @@ MEDIA_PLAYER_ENTITY_ID = os.getenv("MEDIA_PLAYER_ENTITY_ID")
 
 # --- Use the VALID URIs you found in the Music Assistant UI ---
 card_to_playlist = {
-    "71fb59bc": "library://album/1", #Illmatic
-    "a1fd59bc": "library://album/2",  #Ride the lightning
-    "81015abc": "library://album/4", #Stories
-    "91ff59bc": "library://album/5" #Minecraft
+    "71fb59bc": {"media_id": "Illmatic", "media_type": "album"},
+    "a1fd59bc": {"media_id": "Ride the lightning", "media_type": "album"},
+    "81015abc": {"media_id": "Stories", "media_type": "album"},
+    "91ff59bc": {"media_id": "Minecraft", "media_type": "album"}
 }
 
 if not all([HA_URL, HA_TOKEN, MEDIA_PLAYER_ENTITY_ID]):
@@ -32,10 +32,12 @@ def cast_music():
         if card_id not in card_to_playlist:
             return jsonify({"status": "error", "message": "Card ID not found"}), 404
 
-        uri = card_to_playlist[card_id]
-        media_type = uri.split("://")[1].split("/")[0]
+        # Extract the dictionary values directly
+        media_info = card_to_playlist[card_id]
+        media_id = media_info["media_id"]
+        media_type = media_info["media_type"]
         
-        logging.info(f"Calling music_assistant.play_media with URI: {uri} on player {MEDIA_PLAYER_ENTITY_ID}")
+        logging.info(f"Calling music_assistant.play_media with ID: '{media_id}' on player {MEDIA_PLAYER_ENTITY_ID}")
 
         service_url = f"{HA_URL}/api/services/music_assistant/play_media"
         
@@ -46,8 +48,9 @@ def cast_music():
 
         payload = {
             "entity_id": MEDIA_PLAYER_ENTITY_ID,
-            "media_id": uri,
-            "media_type": media_type 
+            "media_id": media_id,
+            "media_type": media_type,
+            "enqueue": "play"
         }
 
         response = requests.post(service_url, headers=headers, json=payload)
