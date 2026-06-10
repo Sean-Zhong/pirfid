@@ -66,5 +66,34 @@ def cast_music():
         logging.error(f"An error occurred: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
+@app.route("/stop", methods=["POST"])
+def stop_music():
+    try:
+        logging.info(f"Calling media_player.media_pause on {MEDIA_PLAYER_ENTITY_ID}")
+
+        service_url = f"{HA_URL}/api/services/media_player/media_pause"
+
+        headers = {
+            "Authorization": f"Bearer {HA_TOKEN}",
+            "Content-Type": "application/json",
+        }
+
+        payload = {
+            "entity_id": MEDIA_PLAYER_ENTITY_ID
+        }
+
+        response = requests.post(service_url, headers=headers, json=payload)
+
+        if response.status_code == 200:
+            logging.info("Successfully sent stop command.")
+            return jsonify({"status": "success", "message": "Stop command sent."}), 200
+        else:
+            logging.error(f"Failed to stop. Status: {response.status_code}, Response: {response.text}")
+            return jsonify({"status": "error", "message": "Failed to stop."}), 500
+
+    except Exception as e:
+        logging.error(f"An error occurred stopping: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
