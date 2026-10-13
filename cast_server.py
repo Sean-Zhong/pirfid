@@ -17,7 +17,7 @@ card_to_playlist = {
     "a1fd59bc": {"media_id": "Ride the lightning", "media_type": "album"},
     "81015abc": {"media_id": "Stories", "media_type": "album"},
     "91ff59bc": {"media_id": "Minecraft", "media_type": "album"},
-    "010b5abc": {
+    "10b5abce": {
         "media_id": "ytmusic--gpNMUhoC://playlist/RDCLAK5uy_neriXH6JbZPr7Pf4LOi5bGQP-_lWRZXs4",
         "media_type": "playlist"
     }
