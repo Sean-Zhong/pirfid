@@ -21,6 +21,7 @@ card_to_playlist = {
         "media_id": "ytmusic--gpNMUhoC://playlist/RDCLAK5uy_neriXH6JbZPr7Pf4LOi5bGQP-_lWRZXs4",
         "media_type": "playlist"
     }
+}
 
 if not all([HA_URL, HA_TOKEN, MEDIA_PLAYER_ENTITY_ID]):
     logging.error("Missing required environment variables (HA_URL, HA_TOKEN, MEDIA_PLAYER_ENTITY_ID)")
