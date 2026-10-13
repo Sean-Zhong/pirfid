@@ -33,6 +33,8 @@ def cast_music():
         data = request.json
         card_id = data.get("card_id")
 
+        logging.info(f"THE SCANNER SENT THIS ID: '{card_id}'")
+
         if card_id not in card_to_playlist:
             return jsonify({"status": "error", "message": "Card ID not found"}), 404
 
