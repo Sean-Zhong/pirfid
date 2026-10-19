@@ -17,10 +17,10 @@ card_to_playlist = {
     "a1fd59bc": {"media_id": "Ride the lightning", "media_type": "album"},
     "81015abc": {"media_id": "Stories", "media_type": "album"},
     "91ff59bc": {"media_id": "Minecraft", "media_type": "album"},
-    "71035abc": {"media_id": "Illmatic", "media_type": "album"}
-#        "media_id": "ytmusic--gpNMUhoC://playlist/RDCLAK5uy_neriXH6JbZPr7Pf4LOi5bGQP-_lWRZXs4",
-#        "media_type": "playlist"
-#    }
+    "10d5abce": {
+        "media_id": "ytmusic--gpNMUhoC://playlist/RDCLAK5uy_neriXH6JbZPr7Pf4LOi5bGQP-_lWRZXs4",
+        "media_type": "playlist"
+    }
 }
 
 if not all([HA_URL, HA_TOKEN, MEDIA_PLAYER_ENTITY_ID]):
