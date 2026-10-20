@@ -43,48 +43,43 @@ def cast_music():
         media_info = card_to_playlist[card_id]
         media_id = media_info["media_id"]
         media_type = media_info["media_type"]
-        should_shuffle = media_info.get("shuffle", False)
-
-        logging.info(f"Calling music_assistant.play_media with ID: '{media_id}' on player {MEDIA_PLAYER_ENTITY_ID}")
-
-        service_url = f"{HA_URL}/api/services/music_assistant/play_media"
+        should_shuffle = media_info.get("shuffle", False) 
 
         headers = {
             "Authorization": f"Bearer {HA_TOKEN}",
             "Content-Type": "application/json",
         }
 
+        # Base payload for Music Assistant
         payload = {
             "entity_id": MEDIA_PLAYER_ENTITY_ID,
             "media_id": media_id,
-            "media_type": media_type,
-            "enqueue": "play"
+            "media_type": media_type
         }
 
-        response = requests.post(service_url, headers=headers, json=payload)
+        if should_shuffle:
+            logging.info("Executing truly random shuffled playback sequence.")
+            requests.post(f"{HA_URL}/api/services/media_player/clear_playlist", headers=headers, json={"entity_id": MEDIA_PLAYER_ENTITY_ID})
+            requests.post(f"{HA_URL}/api/services/media_player/shuffle_set", headers=headers, json={"entity_id": MEDIA_PLAYER_ENTITY_ID, "shuffle": True})
 
-        if response.status_code == 200:
-            logging.info(f"Successfully sent play command to Music Assistant.")
+            payload["enqueue"] = "add"
+            response = requests.post(f"{HA_URL}/api/services/music_assistant/play_media", headers=headers, json=payload)
 
-            # --- PER-DISC SHUFFLE LOGIC ---
-            shuffle_url = f"{HA_URL}/api/services/media_player/shuffle_set"
-            shuffle_payload = {
-                "entity_id": MEDIA_PLAYER_ENTITY_ID,
-                "shuffle": should_shuffle
-            }
-            shuffle_response = requests.post(shuffle_url, headers=headers, json=shuffle_payload)
+            requests.post(f"{HA_URL}/api/services/media_player/media_play", headers=headers, json={"entity_id": MEDIA_PLAYER_ENTITY_ID})
 
-            if shuffle_response.status_code == 200:
-                mode = "enabled" if should_shuffle else "disabled"
-                logging.info(f"Successfully {mode} shuffle mode.")
-            else:
-                logging.warning("Failed to update shuffle mode.")
-            # ---------------------------------
+    else:
+        logging.info("Executing standard sequential playback.")
+        requests.post(f"{HA_URL}/api/services/media_player/shuffle_set", headers=headers, json={"entity_id": MEDIA_PLAYER_ENTITY_ID, "shuffle": False})
 
-            return jsonify({"status": "success", "message": "Command sent."}), 200
-        else:
-            logging.error(f"Failed to call Music Assistant. Status: {response.status_code}, Response: {response.text}")
-            return jsonify({"status": "error", "message": "Failed to call Music Assistant service."}), 500
+        payload["enqueue"] = "play"
+        response = requests.post(f"{HA_URL}/api/services/music_assistant/play_media", headers=headers, json=payload)
+
+    if response.status_code == 200:
+        logging.info(f"Successfully sent command to Music Assistant.")
+        return jsonify({"status": "success", "message": "Command sent."}), 200
+    else:
+        logging.error(f"Failed to call Music Assistant. Status: {response.status_code}, Response: {response.text}")
+        return jsonify({"status": "error", "message": "Failed to call Music Assistant service."}), 500
 
     except Exception as e:
         logging.error(f"An error occurred: {e}")
