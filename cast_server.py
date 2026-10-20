@@ -13,11 +13,15 @@ MEDIA_PLAYER_ENTITY_ID = os.getenv("MEDIA_PLAYER_ENTITY_ID")
 
 # --- Use the VALID URIs you found in the Music Assistant UI ---
 card_to_playlist = {
-    "71fb59bc": {"media_id": "Illmatic", "media_type": "album"},
+    #"71fb59bc": {"media_id": "Illmatic", "media_type": "album"},
     "a1fd59bc": {"media_id": "Ride the lightning", "media_type": "album"},
     "81015abc": {"media_id": "Stories", "media_type": "album"},
     "91ff59bc": {"media_id": "Minecraft", "media_type": "album"},
-    "31075abc": {
+    "d38402e2": {
+        "media_id": "ytmusic--gpNMUhoC://playlist/RDCLAK5uy_neriXH6JbZPr7Pf4LOi5bGQP-_lWRZXs4",
+        "media_type": "playlist"
+    },
+    "71fb59bc": {
         "media_id": "ytmusic--gpNMUhoC://playlist/RDCLAK5uy_neriXH6JbZPr7Pf4LOi5bGQP-_lWRZXs4",
         "media_type": "playlist"
     }
