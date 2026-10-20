@@ -67,23 +67,24 @@ def cast_music():
 
             requests.post(f"{HA_URL}/api/services/media_player/media_play", headers=headers, json={"entity_id": MEDIA_PLAYER_ENTITY_ID})
 
-    else:
-        logging.info("Executing standard sequential playback.")
-        requests.post(f"{HA_URL}/api/services/media_player/shuffle_set", headers=headers, json={"entity_id": MEDIA_PLAYER_ENTITY_ID, "shuffle": False})
+        else:
+            logging.info("Executing standard sequential playback.")
+            requests.post(f"{HA_URL}/api/services/media_player/shuffle_set", headers=headers, json={"entity_id": MEDIA_PLAYER_ENTITY_ID, "shuffle": False})
 
-        payload["enqueue"] = "play"
-        response = requests.post(f"{HA_URL}/api/services/music_assistant/play_media", headers=headers, json=payload)
+            payload["enqueue"] = "play"
+            response = requests.post(f"{HA_URL}/api/services/music_assistant/play_media", headers=headers, json=payload)
 
-    if response.status_code == 200:
-        logging.info(f"Successfully sent command to Music Assistant.")
-        return jsonify({"status": "success", "message": "Command sent."}), 200
-    else:
-        logging.error(f"Failed to call Music Assistant. Status: {response.status_code}, Response: {response.text}")
-        return jsonify({"status": "error", "message": "Failed to call Music Assistant service."}), 500
+        if response.status_code == 200:
+            logging.info(f"Successfully sent command to Music Assistant.")
+            return jsonify({"status": "success", "message": "Command sent."}), 200
+        else:
+            logging.error(f"Failed to call Music Assistant. Status: {response.status_code}, Response: {response.text}")
+            return jsonify({"status": "error", "message": "Failed to call Music Assistant service."}), 500
 
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
+
 
 @app.route("/stop", methods=["POST"])
 def stop_music():
