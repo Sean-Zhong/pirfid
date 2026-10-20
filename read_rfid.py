@@ -44,6 +44,8 @@ try:
                 # Lock in this tag as currently playing
                 current_playing_hex = first_4_bytes_hex
 
+                last_seen_timestamp = time.time()
+
         else:
             # ---> NO TAG IS PRESENT <---
             if current_playing_hex is not None:
